@@ -4,11 +4,12 @@
         <title>jQuery dialog plugin</title>
         <link rel="stylesheet" type="text/css" href="css/dialog.css" />
         <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
-        <script type="text/javascript" src="js/dialog.js"></script>
+        <script type="text/javascript" src="js/jQuery.dialog.js"></script>
         
         <script>
             $(document).ready(function() {
-                $.dialog('Hello world','Hi! I\'m a default dialog');
+                var message = $.dialog('Hi! I\'m a default dialog', { title: 'Hello world!'});
+                message.show();
             });
         </script>
     </head>
