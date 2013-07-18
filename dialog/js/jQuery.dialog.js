@@ -7,6 +7,12 @@
                 self.options.onClose(self);
             }
             
+            if (self.modal) {
+                this.modal.animate({
+                    opacity: 'hide'
+                },200); 
+            }
+            
             this.container.animate({
                 opacity: 'hide'
             },200);
@@ -18,15 +24,17 @@
             }).join('');
         },
         
-        init: function(text, opts) {
+        init: function(opts) {
             this.options = $.extend({}, $.dialog.defaults, opts);
-            this.options
-            this.text = text;
+            this.options.width = (parseInt(this.options.width) > 200) ? parseInt(this.options.width) : 200;
+            this.options.buttons = (typeof this.options.buttons === 'object' && this.options.buttons != null) ? this.options.buttons : [];
             
             this.container = $('<div>', {
                 'class': 'dialog',
                 'style': 'display: none; zIndex: 100001'
             });
+            
+            this.container.width(this.options.width);
             
             var domNodes = {
                 modal: $('<div>', {
@@ -47,8 +55,10 @@
                 })
             }
             
+            this.modal = domNodes.modal;
+            
             domNodes.title.html(this.options.title);
-            domNodes.content.html(text);
+            domNodes.content.html(this.options.text);
             domNodes.buttons.html(this.createButtons(this.options.buttons));
             
             var self = this;
@@ -56,13 +66,6 @@
             if (!self.options.showTitle) {
                 domNodes.title.hide();
             }
-            
-            if (self.options.modal) {
-                self.modal = domNodes.modal;
-                self.modal.appendTo('body');
-            }
-            
-            domNodes.closeButton.html('X');
             
             domNodes.closeButton.on('click', function() {
                 self.close();
@@ -75,17 +78,29 @@
                 self.close();
             });
             
-            domNodes.closeButton.appendTo(this.container);
+            if (self.options.icon != null) {
+                domNodes.content.addClass('dialog-icon-' + this.options.icon)
+            }
+            
             domNodes.title.appendTo(this.container);
+            if (self.options.closeButton) {
+                domNodes.closeButton.appendTo(this.container);
+            }
             domNodes.content.appendTo(this.container);
-            domNodes.buttons.appendTo(this.container);
+            if (self.options.buttons.length > 0) {
+                domNodes.buttons.appendTo(this.container);
+            }
         },
         
         show: function() {
             var self = this;
             
             if (self.options.modal) {
-                self.modal.show();
+                //*
+                this.modal.appendTo('body').animate({
+                    opacity: 'show'
+                },1);
+                //*/
             }
             
             this.container.appendTo('body').animate({
@@ -93,13 +108,13 @@
                 left: $(window).width() / 2 - this.container.outerWidth() / 2
             },1).animate({
                 opacity: 'show'
-            },300);
+            },500);
         }
     };
     
-    $.dialog = function(text,options) {
+    $.dialog = function(options) {
         var dialogWindow = Object.create(dialog);
-        dialogWindow.init(text,options);
+        dialogWindow.init(options);
         return dialogWindow;
     };
     
@@ -109,11 +124,14 @@
             'Cancel'
         ],
         callback: null,
-        icon: 'none',
+        closeButton: true,
+        icon: null,
         id: '',
         modal: false,
         onClose: null,
+        text: '',
         title: '',
-        showTitle: true
+        showTitle: true,
+        width: 400
     };
 })(jQuery);
