@@ -14,6 +14,7 @@
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ie-user-select: none;
     cursor: default;
 }
 
@@ -133,4 +134,8 @@
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.draggable {
+    cursor: move;
 }

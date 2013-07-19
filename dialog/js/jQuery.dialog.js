@@ -1,4 +1,4 @@
-(function($) {
+(function($,document,window) {
     var dialog = {
         close: function() {
             self = this;
@@ -33,7 +33,7 @@
             
             this.container = $('<div>', {
                 'class': 'dialog',
-                'style': 'display: none; zIndex: 100001'
+                'style': 'display: none; z-index: 100000'
             });
             
             this.container.width(this.options.width);
@@ -41,7 +41,7 @@
             var domNodes = {
                 modal: $('<div>', {
                     'class': 'dialog-modal',
-                    'style': 'display: none; zIndex: 100000'
+                    'style': 'display: none; z-index: 99999'
                 }),
                 title: $('<div>', {
                     'class': 'dialog-title'
@@ -90,7 +90,7 @@
                 }
             });
             
-            if (self.options.modalClose && self.options.closable) {
+            if (self.options.overlayClose && self.options.closable) {
                 this.modal.on('click', function() {
                     self.close();
                 });
@@ -103,6 +103,50 @@
             domNodes.content.appendTo(this.container);
             if (self.options.buttons.length > 0) {
                 domNodes.buttons.appendTo(this.container);
+            }
+            
+            if (self.options.draggable) {
+                if (self.options.showTitle) {
+                    $el = domNodes.title;
+                } else {
+                    $el = domNodes.content;
+                }
+                
+                $el.on('mousedown', function(e) {
+                    var $this = $(this),
+                        $drag = $this.addClass('active-handle').parent().addClass('draggable');
+                        drg_w = $drag.outerWidth(),
+                        drg_h = $drag.outerHeight(),
+                        pos_x = $drag.offset().left + drg_w - e.pageX,
+                        pos_y = $drag.offset().top + drg_h - e.pageY;
+                        
+                    $drag.parents().on('mousemove', function(e) {
+                        var left = e.pageX + pos_x - drg_w,
+                            top = e.pageY + pos_y - drg_h,
+                            cw, ch;
+                            
+                        if (self.options.constrain) {
+                            cw = $(window).width();
+                            ch = $(window).height();
+                            
+                            left = (left < 0) ? 0 : left;
+                            left = (left + drg_w > cw) ? cw - drg_w : left;
+                            
+                            top = (top < 0) ? 0 : top;
+                            top = (top + drg_h > ch) ? ch - drg_h : top;
+                        }
+                        
+                        $('.draggable').offset({
+                            top: top,
+                            left: left
+                        }).on('mouseup', function() {
+                            $(this).removeClass('draggable');
+                        });
+                    });
+                }).on('mouseup', function() {
+                    $(this).parents().off('mousemove');
+                    $(this).removeClass('active-handle').parent().removeClass('draggable');
+                });
             }
         },
         
@@ -138,14 +182,16 @@
         callback: null,
         closable: true,
         closeButton: true,
+        constrain: true, //Constrain draggable dialog within window
+        draggable: true,
         icon: null,
         id: '',
         modal: true,
-        modalClose: true,
         onClose: null,
+        overlayClose: true, //Close dialog by click on modal layer
         text: '',
         title: '',
         showTitle: true,
         width: 400
     };
-})(jQuery);
+})(jQuery,document,window);
