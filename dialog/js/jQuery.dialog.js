@@ -185,7 +185,6 @@
         constrain: true, //Constrain draggable dialog within window
         draggable: true,
         icon: null,
-        id: '',
         modal: true,
         onClose: null,
         overlayClose: true, //Close dialog by click on modal layer
