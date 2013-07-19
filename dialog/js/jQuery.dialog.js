@@ -16,6 +16,8 @@
             this.container.animate({
                 opacity: 'hide'
             },200);
+            
+            $(document).off('keyup');
         },
         
         createButtons: function(buttons) {
@@ -82,8 +84,20 @@
                 domNodes.content.addClass('dialog-icon-' + this.options.icon)
             }
             
+            $(document).on('keyup', function(e) {
+                if (e.which == 27 && self.options.closable) {
+                    self.close();
+                }
+            });
+            
+            if (self.options.modalClose && self.options.closable) {
+                this.modal.on('click', function() {
+                    self.close();
+                });
+            }
+            
             domNodes.title.appendTo(this.container);
-            if (self.options.closeButton) {
+            if (self.options.closeButton && self.options.closable) {
                 domNodes.closeButton.appendTo(this.container);
             }
             domNodes.content.appendTo(this.container);
@@ -96,11 +110,9 @@
             var self = this;
             
             if (self.options.modal) {
-                //*
                 this.modal.appendTo('body').animate({
                     opacity: 'show'
                 },1);
-                //*/
             }
             
             this.container.appendTo('body').animate({
@@ -124,10 +136,12 @@
             'Cancel'
         ],
         callback: null,
+        closable: true,
         closeButton: true,
         icon: null,
         id: '',
-        modal: false,
+        modal: true,
+        modalClose: true,
         onClose: null,
         text: '',
         title: '',
