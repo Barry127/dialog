@@ -15,7 +15,12 @@
             
             this.container.animate({
                 opacity: 'hide'
-            },200);
+            },200, function() {
+                self.container.remove();
+                if (self.modal) {
+                    self.modal.remove();
+                }
+            });
             
             $(document).off('keyup');
         },
